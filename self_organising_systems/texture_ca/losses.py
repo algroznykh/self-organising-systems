@@ -47,7 +47,7 @@ class StyleModel:
     return gram / tf.cast(h*w, tf.float32)
 
 class Inception:
-  def __init__(self, layer, ch):
+  def __init__(self, layer, ch=None):
     with tf.io.gfile.GFile(cfg.texture_ca.inception_pb, 'rb') as f:
       self.graph_def = tf.compat.v1.GraphDef.FromString(f.read())
     self.layer = layer
@@ -66,26 +66,8 @@ class Inception:
     imgs = x*255.0-117.0
     outputs = tf.import_graph_def(self.graph_def, {'input':imgs}, self.outputs)
     a = tf.concat(outputs, -1)
+    if self.ch is None:
+      return -tf.reduce_mean(a[...,:]) + overflow_loss*cfg.texture_ca.overflow_loss_coef
+
     return -tf.reduce_mean(a[...,self.ch]) + overflow_loss*cfg.texture_ca.overflow_loss_coef
-  
-class DeepDream:
-  def __init__(self, layer):
-    with tf.io.gfile.GFile(cfg.texture_ca.inception_pb, 'rb') as f:
-      self.graph_def = tf.compat.v1.GraphDef.FromString(f.read())
-    self.layer = layer
-    
-    avgpool0_idx = [n.name for n in self.graph_def.node].index('avgpool0')
-    del self.graph_def.node[avgpool0_idx:]
-    # use pre_relu layers for Concat nodes
-    node = {n.name:n for n in self.graph_def.node}[layer]
-    self.outputs = [layer+':0']
-    if 'Concat' in node.op:
-      self.outputs = [inp+'_pre_relu:0' for inp in node.input[1:]]
-  
-  @tf.function
-  def __call__(self, x):
-    overflow_loss = tf.reduce_mean(tf.square(tf.clip_by_value(x, 0.0, 1.0)-x))
-    imgs = x*255.0-117.0
-    outputs = tf.import_graph_def(self.graph_def, {'input':imgs}, self.outputs)
-    a = tf.concat(outputs, -1)
-    return -tf.reduce_mean(a[...,:]) + overflow_loss*cfg.texture_ca.overflow_loss_coef
+
