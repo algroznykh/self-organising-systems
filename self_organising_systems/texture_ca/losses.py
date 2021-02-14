@@ -68,8 +68,7 @@ class Inception:
     a = tf.concat(outputs, -1)
     return -tf.reduce_mean(a[...,self.ch]) + overflow_loss*cfg.texture_ca.overflow_loss_coef
   
-  
-  class DeepDream:
+class DeepDream:
   def __init__(self, layer):
     with tf.io.gfile.GFile(cfg.texture_ca.inception_pb, 'rb') as f:
       self.graph_def = tf.compat.v1.GraphDef.FromString(f.read())
