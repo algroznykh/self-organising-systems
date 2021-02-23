@@ -52,8 +52,11 @@ class Inception:
       self.graph_def = tf.compat.v1.GraphDef.FromString(f.read())
     self.layer = layer
     self.ch = ch
-    avgpool0_idx = [n.name for n in self.graph_def.node].index('avgpool0')
-    del self.graph_def.node[avgpool0_idx:]
+    try: 
+      avgpool0_idx = [n.name for n in self.graph_def.node].index('avgpool0')
+      del self.graph_def.node[avgpool0_idx:]
+    except ValueError as e:
+      print(e)
     # use pre_relu layers for Concat nodes
     node = {n.name:n for n in self.graph_def.node}[layer]
     self.outputs = [layer+':0']
