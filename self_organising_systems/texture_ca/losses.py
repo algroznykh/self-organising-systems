@@ -60,8 +60,8 @@ class Inception:
     # use pre_relu layers for Concat nodes
     node = {n.name:n for n in self.graph_def.node}[layer]
     self.outputs = [layer+':0']
-    if 'Concat' in node.op:
-      self.outputs = [inp+'_pre_relu:0' for inp in node.input[1:]]
+    # if 'Concat' in node.op:
+    #  self.outputs = [inp+'_pre_relu:0' for inp in node.input[1:]]
   
   @tf.function
   def __call__(self, x):
