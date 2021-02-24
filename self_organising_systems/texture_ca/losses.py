@@ -47,10 +47,10 @@ class StyleModel:
     return gram / tf.cast(h*w, tf.float32)
 
 class Inception:
-  def __init__(self, layer, ch=None, input_name=None, avgpool_name=None):
+  def __init__(self, layers, ch=None, input_name=None, avgpool_name=None):
     with tf.io.gfile.GFile(cfg.texture_ca.inception_pb, 'rb') as f:
       self.graph_def = tf.compat.v1.GraphDef.FromString(f.read())
-    self.layer = layer
+    self.layer = layers
     self.ch = ch
     if input_name is None:
       input_name = 'input'
@@ -66,8 +66,12 @@ class Inception:
     except ValueError as e:
       print(e)
     # use pre_relu layers for Concat nodes
-    node = {n.name:n for n in self.graph_def.node}[layer]
-    self.outputs = [layer+':0']
+    if not isinstance(layers, list):
+      layers = [layers]
+    self.outputs = []
+    for layer in layers:
+      node = {n.name:n for n in self.graph_def.node}[layer]
+      self.outputs += [layer+':0']
     # if 'Concat' in node.op:
     #  self.outputs = [inp+'_pre_relu:0' for inp in node.input[1:]]
   
