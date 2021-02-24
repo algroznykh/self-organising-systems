@@ -58,7 +58,7 @@ class Inception:
     
     if avgpool_name is None:
       avgpool_name = 'avgpool0'
-     self.avgpool_name = avgpool_name
+      self.avgpool_name = avgpool_name
     
     try: 
       avgpool0_idx = [n.name for n in self.graph_def.node].index(avgpool_name)
