@@ -78,10 +78,10 @@ class Inception:
   @tf.function
   def __call__(self, x):
     loss = tf.reduce_mean(tf.square(tf.clip_by_value(x, 0.0, 1.0)-x))*cfg.texture_ca.overflow_loss_coef
-    imgs = x*255.0-117.0
+    imgs = x  *255.0-117.0
 
     for o in self.outputs:
-      outputs = tf.import_graph_def(self.graph_def, {self.input_name:imgs}, o)
+      outputs = tf.import_graph_def(self.graph_def, {self.input_name:imgs}, [o])
       a = tf.concat(outputs, -1)
     
       if self.ch is None:
