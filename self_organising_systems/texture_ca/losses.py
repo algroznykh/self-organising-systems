@@ -53,7 +53,9 @@ class Inception:
     self.layer = layer
     self.ch = ch
     if input_name is None:
-      self.input_name = 'input';
+      input_name = 'input'
+    self.input_name = input_name
+    
     try: 
       avgpool0_idx = [n.name for n in self.graph_def.node].index('avgpool0')
       del self.graph_def.node[avgpool0_idx:]
