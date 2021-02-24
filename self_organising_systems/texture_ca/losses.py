@@ -52,7 +52,8 @@ class Inception:
       self.graph_def = tf.compat.v1.GraphDef.FromString(f.read())
     self.layer = layer
     self.ch = ch
-    self.input_name = 'input';
+    if input_name is None:
+      self.input_name = 'input';
     try: 
       avgpool0_idx = [n.name for n in self.graph_def.node].index('avgpool0')
       del self.graph_def.node[avgpool0_idx:]
