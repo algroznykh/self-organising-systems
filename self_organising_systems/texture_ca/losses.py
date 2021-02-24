@@ -47,11 +47,12 @@ class StyleModel:
     return gram / tf.cast(h*w, tf.float32)
 
 class Inception:
-  def __init__(self, layer, ch=None):
+  def __init__(self, layer, ch=None, input_name=None):
     with tf.io.gfile.GFile(cfg.texture_ca.inception_pb, 'rb') as f:
       self.graph_def = tf.compat.v1.GraphDef.FromString(f.read())
     self.layer = layer
     self.ch = ch
+    self.input_name = 'input';
     try: 
       avgpool0_idx = [n.name for n in self.graph_def.node].index('avgpool0')
       del self.graph_def.node[avgpool0_idx:]
@@ -67,7 +68,7 @@ class Inception:
   def __call__(self, x):
     overflow_loss = tf.reduce_mean(tf.square(tf.clip_by_value(x, 0.0, 1.0)-x))
     imgs = x*255.0-117.0
-    outputs = tf.import_graph_def(self.graph_def, {'input':imgs}, self.outputs)
+    outputs = tf.import_graph_def(self.graph_def, {self.input_name:imgs}, self.outputs)
     a = tf.concat(outputs, -1)
     if self.ch is None:
       return -tf.reduce_mean(a[...,:]) + overflow_loss*cfg.texture_ca.overflow_loss_coef
