@@ -47,7 +47,7 @@ class StyleModel:
     return gram / tf.cast(h*w, tf.float32)
 
 class Inception:
-  def __init__(self, layer, ch=None, input_name=None):
+  def __init__(self, layer, ch=None, input_name=None, avgpool_name=None):
     with tf.io.gfile.GFile(cfg.texture_ca.inception_pb, 'rb') as f:
       self.graph_def = tf.compat.v1.GraphDef.FromString(f.read())
     self.layer = layer
@@ -56,8 +56,12 @@ class Inception:
       input_name = 'input'
     self.input_name = input_name
     
+    if avgpool_name is None:
+      avgpool_name = 'avgpool0'
+     self.avgpool_name = avgpool_name
+    
     try: 
-      avgpool0_idx = [n.name for n in self.graph_def.node].index('avgpool0')
+      avgpool0_idx = [n.name for n in self.graph_def.node].index(avgpool_name)
       del self.graph_def.node[avgpool0_idx:]
     except ValueError as e:
       print(e)
