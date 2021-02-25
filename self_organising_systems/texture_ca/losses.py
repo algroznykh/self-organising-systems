@@ -47,7 +47,7 @@ class StyleModel:
     return gram / tf.cast(h*w, tf.float32)
 
 class Inception:
-  def __init__(self, layers, ch=None, input_name=None, avgpool_name=None):
+  def __init__(self, layers, ch=None, xy=None, input_name=None, avgpool_name=None):
     with tf.io.gfile.GFile(cfg.texture_ca.inception_pb, 'rb') as f:
       self.graph_def = tf.compat.v1.GraphDef.FromString(f.read())
     self.layer = layers
@@ -83,10 +83,11 @@ class Inception:
     for o in self.outputs:
       outputs = tf.import_graph_def(self.graph_def, {self.input_name:imgs}, [o])
       a = tf.concat(outputs, -1)
-    
-      if self.ch is None:
-        loss += -tf.reduce_mean(a[...,:])
-      else:
-        loss += -tf.reduce_mean(a[...,self.ch])
-    return loss
+
+      obj = a[...,:]
+      if self.ch is not None:
+        obj = obj[...,self.ch]
+      if self.xy is not None:
+        obj = obj[:, xy[0], xy[1], :]
+    return loss - tf.reduce_mean(obj)
 
