@@ -89,6 +89,6 @@ class Inception:
       if self.ch is not None:
         obj = obj[...,self.ch]
       if self.xy is not None:
-        obj = obj[:, xy[0], xy[1], :]
+        obj = obj[:, self.xy[0], self.xy[1], :]
     return loss - tf.reduce_mean(obj)
 
