@@ -52,6 +52,7 @@ class Inception:
       self.graph_def = tf.compat.v1.GraphDef.FromString(f.read())
     self.layer = layers
     self.ch = ch
+    self.xy = xy
     if input_name is None:
       input_name = 'input'
     self.input_name = input_name
