@@ -85,10 +85,9 @@ class Inception:
       outputs = tf.import_graph_def(self.graph_def, {self.input_name:imgs}, [o])
       a = tf.concat(outputs, -1)
 
-      obj = a[...,:]
       if self.ch is not None:
-        obj = obj[...,self.ch]
+        a = a[...,self.ch]
       if self.xy is not None:
-        obj = obj[:, self.xy[0], self.xy[1], :]
-    return loss - tf.reduce_mean(obj)
+        a = a[:, self.xy[0], self.xy[1], ...]
+    return loss - tf.reduce_mean(a)
 
