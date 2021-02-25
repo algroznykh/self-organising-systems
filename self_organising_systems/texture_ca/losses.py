@@ -88,6 +88,6 @@ class Inception:
       if self.ch is not None:
         a = a[...,self.ch]
       if self.xy is not None:
-        a = a[self.xy[0], self.xy[1], ...]
-    return loss - tf.reduce_mean(a)
+        a = a[:, self.xy[0]:self.xy[0]+1, self.xy[1]:self.xy[1]+1, ...]
+    return loss - tf.reduce_mean()
 
