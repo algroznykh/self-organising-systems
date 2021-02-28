@@ -100,7 +100,7 @@ class CAModel:
       if fire_rate is None:
         fire_rate = self.fire_rate
       #update_mask = tf.random.uniform(tf.shape(x[:, :, :, :1])) <= fire_rate
-      update_mask = x[:, :, :, :1] <= fire_rate
+      update_mask = x[:, :, :, :1] / 2 + tf.random.uniform(tf.shape(x[:, :, :, :1])) / 2 <= fire_rate
       x += dx * tf.cast(update_mask, tf.float32)
       x = qfunc(x, min=-cfg.texture_ca.q, max=cfg.texture_ca.q)
       return x
